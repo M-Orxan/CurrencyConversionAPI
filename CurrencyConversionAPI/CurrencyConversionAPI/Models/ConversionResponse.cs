@@ -11,6 +11,11 @@ namespace CurrencyConversionAPI.Models
         [JsonProperty("result")]
         public string Result { get; set; }
 
+        [JsonProperty("conversion_rates")]
+        public Dictionary<string, double> ConversionRates { get; set; }
+
+
+
 
 
     }

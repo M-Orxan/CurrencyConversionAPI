@@ -21,7 +21,7 @@ namespace CurrencyConversionAPI.Controllers
 
         }
 
-        
+
         [HttpGet("convert/{fromCurrency}/{toCurrency}/{amount}")]
 
         public async Task<IActionResult> Convert(string fromCurrency, string toCurrency, double amount)
@@ -42,10 +42,7 @@ namespace CurrencyConversionAPI.Controllers
 
                 var conversionResponse = JsonConvert.DeserializeObject<ConversionResponse>(response);
 
-                if (conversionResponse == null || conversionResponse.Result != "success")
-                {
-                    return BadRequest("Error fetching exchange rate.");
-                }
+
 
 
                 double convertedAmount = conversionResponse.ConversionRate * amount;
@@ -68,9 +65,48 @@ namespace CurrencyConversionAPI.Controllers
         }
 
 
+        [HttpGet("ShowLatestExchangeRates/{currency}")]
+        public async Task<IActionResult> ShowLatestExchangeRates(string currency)
+        {
+
+            string endpoint = $"latest/{currency}";
+            string fullPath = $"{baseAddress}/{apiKey}/{endpoint}";
+
+            var uri = new Uri(fullPath);
+
+            HttpResponseMessage responseMessage = await _httpClient.GetAsync(uri);
+
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                string response = await _httpClient.GetStringAsync(uri);
+
+                var conversionResponse = JsonConvert.DeserializeObject<ConversionResponse>(response);
+
+                Dictionary<string, double> conversionRates = conversionResponse.ConversionRates;
 
 
-      
+                string message = "";
+
+                foreach (var item in conversionRates)
+                {
+                    message += $"{item.Key} : {item.Value}\n";
+
+                }
+                return Ok(message);
+
+
+            }
+            else
+            {
+                return BadRequest("Invalid input");
+            }
+
+
+
+
+        }
+
+
 
     }
 
